@@ -1,0 +1,85 @@
+# ================================
+# TRAFFIC ACCIDENT ANALYTICS SYSTEM
+# ================================
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import LabelEncoder
+
+# -------------------------------
+# SAMPLE DATA (same as your table)
+# -------------------------------
+data = {
+    'LocationID': ['LOC-001','LOC-002','LOC-003','LOC-004','LOC-005',
+                   'LOC-006','LOC-007','LOC-008','LOC-009','LOC-010'],
+    'Weather': ['Rain','Clear','Fog','Rain','Clear',
+                'Cloudy','Fog','Rain','Clear','Cloudy'],
+    'Time': [18,9,6,22,14,17,5,20,11,16],
+    'RoadType': ['Highway','Urban','Rural','Highway','Urban',
+                 'Urban','Rural','Highway','Urban','Rural'],
+    'VehicleType': ['Car','Bike','Truck','Car','Bus',
+                    'Car','Bike','Truck','Car','Bus'],
+    'Severity': ['High','Medium','High','High','Low',
+                 'Medium','High','High','Low','Medium']
+}
+
+df = pd.DataFrame(data)
+
+# -------------------------------
+# DATA PREPROCESSING
+# -------------------------------
+df.fillna(method='ffill', inplace=True)
+
+# Keep original for visualization
+df_visual = df.copy()
+
+# Encode for analysis
+le = LabelEncoder()
+for col in df.select_dtypes(include=['object']).columns:
+    df[col] = le.fit_transform(df[col])
+
+# -------------------------------
+# ANALYSIS
+# -------------------------------
+print("\n=== DATASET INFO ===\n")
+print(df.info())
+
+print("\n=== STATISTICAL SUMMARY ===\n")
+print(df.describe())
+
+print("\n=== CORRELATION MATRIX ===\n")
+print(df.corr())
+
+# -------------------------------
+# VISUALIZATION
+# -------------------------------
+
+# 1. Pie Chart - Severity Distribution
+df_visual['Severity'].value_counts().plot(
+    kind='pie', autopct='%1.1f%%'
+)
+plt.title("Accident Severity Distribution")
+plt.ylabel("")
+plt.show()
+
+# 2. Bar Chart - Weather vs Accidents
+sns.countplot(x='Weather', data=df_visual)
+plt.title("Weather vs Accidents")
+plt.show()
+
+# 3. Bar Chart - Road Type vs Severity
+sns.countplot(x='RoadType', hue='Severity', data=df_visual)
+plt.title("Road Type vs Severity")
+plt.show()
+
+# 4. Histogram - Time vs Accidents
+sns.histplot(df_visual['Time'], bins=8)
+plt.title("Time vs Accidents")
+plt.xlabel("Hour")
+plt.show()
+
+# 5. Heatmap - Correlation
+sns.heatmap(df.corr(), annot=True, cmap='coolwarm')
+plt.title("Correlation Heatmap")
+plt.show()# Data-analytics-
